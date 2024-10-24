@@ -1378,6 +1378,210 @@ function App() {
       );
   }
 
+  function hexOutputFromHexInput(input1) {
+    const twoDotString = ":";
+    let input1First = input1;
+    let input1Second = null;
+
+    if (input1.includes(".")) {
+      [input1First, input1Second] = input1.split(".");
+    }
+
+    const hexIntA = input1First;
+    const inputOneInteger = hexIntA.split(/[ \-_]/);
+
+    const inputOneIntegerAnalyser = inputOneInteger.map((inputOneInt) => {
+      if (inputOneInt === "") {
+        return 0;
+      } else {
+        return parseInt(inputOneInt, 16);
+      }
+    });
+    const inputOneIntegerDecimalResult = inputOneIntegerAnalyser.join("");
+    const input1HexResult = inputOneIntegerDecimalResult * 1;
+    const hexIntB = input1Second;
+    let inputTwo = [];
+    if (hexIntB) {
+      inputTwo = hexIntB.split(/[ \-_]/);
+    }
+
+    const input2Analyser = inputTwo.map((inputB) => {
+      if (inputB === "") {
+        return 0;
+      }
+
+      const singleCharMapping = {
+        0: 0,
+        1: 0.0625,
+        2: 0.125,
+        3: 0.1875,
+        4: 0.25,
+        5: 0.3125,
+        6: 0.375,
+        7: 0.4375,
+        8: 0.5,
+        9: 0.5625,
+        A: 0.625,
+        B: 0.6875,
+        C: 0.75,
+        D: 0.8125,
+        E: 0.875,
+        F: 0.9375,
+      };
+
+      if (inputB.length === 1 && singleCharMapping.hasOwnProperty(inputB)) {
+        return singleCharMapping[inputB];
+      }
+
+      if (inputB.length === 2) {
+        let firstChar = inputB[0];
+        let secondChar = inputB[1];
+
+        if (firstChar === "0" && singleCharMapping.hasOwnProperty(secondChar)) {
+          return singleCharMapping[secondChar] / 16;
+        }
+
+        if (firstChar === "1" && singleCharMapping.hasOwnProperty(secondChar)) {
+          return 0.0625 + singleCharMapping[secondChar] / 16;
+        }
+        if (firstChar === "2" && singleCharMapping.hasOwnProperty(secondChar)) {
+          return 0.125 + singleCharMapping[secondChar] / 16;
+        }
+        if (firstChar === "3" && singleCharMapping.hasOwnProperty(secondChar)) {
+          return 0.1875 + singleCharMapping[secondChar] / 16;
+        }
+        if (firstChar === "4" && singleCharMapping.hasOwnProperty(secondChar)) {
+          return 0.25 + singleCharMapping[secondChar] / 16;
+        }
+        if (firstChar === "5" && singleCharMapping.hasOwnProperty(secondChar)) {
+          return 0.3125 + singleCharMapping[secondChar] / 16;
+        }
+        if (firstChar === "6" && singleCharMapping.hasOwnProperty(secondChar)) {
+          return 0.375 + singleCharMapping[secondChar] / 16;
+        }
+        if (firstChar === "7" && singleCharMapping.hasOwnProperty(secondChar)) {
+          return 0.4375 + singleCharMapping[secondChar] / 16;
+        }
+        if (firstChar === "8" && singleCharMapping.hasOwnProperty(secondChar)) {
+          return 0.5 + singleCharMapping[secondChar] / 16;
+        }
+        if (firstChar === "9" && singleCharMapping.hasOwnProperty(secondChar)) {
+          return 0.5625 + singleCharMapping[secondChar] / 16;
+        }
+        if (firstChar === "A" && singleCharMapping.hasOwnProperty(secondChar)) {
+          return 0.625 + singleCharMapping[secondChar] / 16;
+        }
+        if (firstChar === "B" && singleCharMapping.hasOwnProperty(secondChar)) {
+          return 0.6875 + singleCharMapping[secondChar] / 16;
+        }
+        if (firstChar === "C" && singleCharMapping.hasOwnProperty(secondChar)) {
+          return 0.75 + singleCharMapping[secondChar] / 16;
+        }
+        if (firstChar === "D" && singleCharMapping.hasOwnProperty(secondChar)) {
+          return 0.8125 + singleCharMapping[secondChar] / 16;
+        }
+        if (firstChar === "E" && singleCharMapping.hasOwnProperty(secondChar)) {
+          return 0.875 + singleCharMapping[secondChar] / 16;
+        }
+        if (firstChar === "F" && singleCharMapping.hasOwnProperty(secondChar)) {
+          return 0.9375 + singleCharMapping[secondChar] / 16;
+        }
+      }
+
+      return "NotANumber";
+    });
+    const input2DecimalResult = input2Analyser.join("");
+    const input2HexResult = input2DecimalResult * 1;
+    const internalCounter = input1.includes("-")
+      ? (input1HexResult + input2HexResult) * 64 * -1
+      : (input1HexResult + input2HexResult) * 64;
+
+    const numberAtCeiling = input1.includes("-")
+      ? Math.floor((input1HexResult + input2HexResult) * -1)
+      : Math.ceil(input1HexResult + input2HexResult);
+    const multiplyOfSixtyFour = 64 * numberAtCeiling;
+    const partAfterTwoDots = input1.includes("-")
+      ? (internalCounter - (multiplyOfSixtyFour + 64)) * -1
+      : internalCounter - (multiplyOfSixtyFour - 64);
+
+    let switchableMinusSignString = "";
+    if (input1.includes("-")) {
+      switchableMinusSignString = "-";
+    }
+
+    let correctedFirstOrder = partAfterTwoDots;
+    if (partAfterTwoDots === 64) {
+      correctedFirstOrder = 0;
+    }
+
+    let firstOrderTwoCharacterCheck = correctedFirstOrder.toString(16);
+    if (correctedFirstOrder >= 0 && correctedFirstOrder < 16) {
+      firstOrderTwoCharacterCheck = "0" + correctedFirstOrder.toString(16);
+    }
+
+    const numberAtFloor = Math.floor(input1HexResult + input2HexResult);
+    const internalThirdOrder = numberAtFloor / 64;
+    const thirdOrderAtFloor = Math.floor(internalThirdOrder);
+
+    let correctedSecondOrder = numberAtFloor;
+    if (internalThirdOrder >= 1) {
+      correctedSecondOrder = numberAtFloor - 64 * thirdOrderAtFloor;
+    }
+
+    let secondOrderTwoCharacterCheck = correctedSecondOrder.toString(16);
+    if (correctedSecondOrder >= 0 && correctedSecondOrder < 16) {
+      secondOrderTwoCharacterCheck = "0" + correctedSecondOrder.toString(16);
+    }
+
+    const thirdOrderDisplay = thirdOrderAtFloor.toString(16);
+
+    if (isNaN(partAfterTwoDots) || !isFinite(partAfterTwoDots)) {
+      return "Out of bounds or input is not a valid number";
+    }
+
+    const hexStringInputSum = input1.toString(16).toUpperCase();
+    if (
+      hexStringInputSum.includes("G") ||
+      hexStringInputSum.includes("H") ||
+      hexStringInputSum.includes("I") ||
+      hexStringInputSum.includes("J") ||
+      hexStringInputSum.includes("K") ||
+      hexStringInputSum.includes("L") ||
+      hexStringInputSum.includes("M") ||
+      hexStringInputSum.includes("N") ||
+      hexStringInputSum.includes("O") ||
+      hexStringInputSum.includes("P") ||
+      hexStringInputSum.includes("Q") ||
+      hexStringInputSum.includes("R") ||
+      hexStringInputSum.includes("S") ||
+      hexStringInputSum.includes("T") ||
+      hexStringInputSum.includes("U") ||
+      hexStringInputSum.includes("V") ||
+      hexStringInputSum.includes("W") ||
+      hexStringInputSum.includes("X") ||
+      hexStringInputSum.includes("Y") ||
+      hexStringInputSum.includes("Z")
+    ) {
+      return "Input includes not a number character (G-Z)";
+    }
+    if (internalThirdOrder >= 1) {
+      return (
+        switchableMinusSignString +
+        thirdOrderDisplay +
+        twoDotString +
+        secondOrderTwoCharacterCheck +
+        twoDotString +
+        firstOrderTwoCharacterCheck
+      );
+    } else
+      return (
+        switchableMinusSignString +
+        secondOrderTwoCharacterCheck +
+        twoDotString +
+        firstOrderTwoCharacterCheck
+      );
+  }
+
   function hoursInSeptRestInHexFromHexInput(input1, boolean1) {
     const twoDotString = ":";
     const twoDotAndZeroString = ":0";
@@ -2711,6 +2915,7 @@ function App() {
               Characters:{" "}
             </p>
             <p>Decimal elongated (64min) hours & rest in Hex: </p>
+            <p>Hexadecimal elongated (64min) hours & rest in Hex: </p>
             <p>Septimal elongated (64min) hours & rest in Hex: </p>
             <p>Number of days composed of 21 elongated hours: </p>
           </div>
@@ -2727,6 +2932,7 @@ function App() {
             <p>{minInHexSecInHexFromMinInput(minutesForAltValue)}</p>
             <p>{minInAlienHexSecInAlienHexFromMinInput(minutesForAltValue)}</p>
             <p>{hoursInDecRestInHexFromHexInput(minutesForAltValue)}</p>
+            <p>{hexOutputFromHexInput(minutesForAltValue)}</p>
             <p>{hoursInSeptRestInHexFromHexInput(minutesForAltValue, false)}</p>
             <p>{hoursInSeptRestInHexFromHexInput(minutesForAltValue, true)}</p>
           </div>
